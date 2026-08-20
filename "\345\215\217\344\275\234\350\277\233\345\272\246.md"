@@ -20,6 +20,28 @@ Windows 轻量录屏工具，macOS 风格 UI，**基于 PySide6 (Qt for Python) 
 - **构建脚本**：`build_pyside6.bat`（双击打包，使用 pyside6 venv 的 PyInstaller `--collect-all PySide6`，不依赖系统 PATH）
 - **单测**：`test_screen_recorder.py`（unittest，覆盖 tkinter 版核心逻辑；PySide6 版以无头冒烟测试 + `py_compile` 校验代替 GUI 单测）
 
+## 版本管理与提交规范（Git）
+
+本项目已接入 Git 本地版本管理（仓库位于 `screen-recorder/`），并计划开源托管于 GitHub（见文末「开源发布」）。
+
+### ⚠️ 约定（每一轮改进 / 修复都必须执行）
+1. **每完成一轮，必须提交一次**，提交信息格式：`第N轮：<一句话说明本次改动>`。
+2. 提交前确认工作区无重要未跟踪文件；临时脚本（`test_*/diag_*/replace_*/cleanup_*`）、`ffmpeg.exe`、`build/`、`dist/`、`.workbuddy/` 已由 `.gitignore` 排除，不会误入库。
+3. 主源码只改 `screen_recorder_pyside6_v2.py`；改完先 `py_compile` + 离屏回归，再提交。
+4. 每轮改动**先更新本《协作进度》（带「记录人」署名）**，`git commit` 紧随其后。
+5. 回滚：`git log --oneline` 查哈希 → `git checkout <哈希>` 查看旧版；`git reset --hard <哈希>` 彻底回退（慎用）。
+
+### 常用命令
+- 提交：`git add -A && git commit -m "第N轮：说明"`
+- 历史：`git log --oneline`
+- 推送 GitHub：`git push`
+- 注意：`ffmpeg.exe`（102MB）不入库，换机需单独带上。
+
+### 开源发布（GitHub）
+- 远程名 `origin`（GitHub 公开仓库，作为开源项目）。
+- 发布前确保含 `README.md` 与 `LICENSE`（开源许可文件）。
+- 推送：`git push -u origin master`（首次）/ `git push`（后续）。
+
 ## 文件结构
 
 ```
