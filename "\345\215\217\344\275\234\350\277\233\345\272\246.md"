@@ -1619,3 +1619,26 @@ v4.0 后电平已有响应，但"只有系统声音非常大时才有两三格"�
 - [ ] 系统声音（立体声混音）录制 → 声音与之前一致（未被降噪污染）
 - [ ] 系统声音 + 麦克风混音 → 麦克风支路降噪、系统支路保持
 - [ ] `[电平诊断]` 行已含 设备/后端 字段
+
+## 附录：Git 版本管理规范（团队约定）
+
+> 记录人：WorkBuddy AI 助手 ｜ 生效：第二十九轮之后
+
+### 为什么用 Git
+主源码 `screen_recorder_pyside6_v2.py` 经多轮改动后长期无版本保护，一旦某轮改坏只能靠记忆/手备份恢复。自本约定起，项目以 Git 仓库管理（位于 `screen-recorder/`），可随时回滚任意一轮。
+
+### 仓库约定
+- **每轮改进必须提交**：完成一轮（或一次有意义的改动）后，必须执行提交并写清说明，例如：
+  ```
+  git add -A
+  git commit -m "第30轮：xxx 改进说明"
+  ```
+- **初始基准**：提交 `0a077da`「初始基准：29轮修改后主源码与工程文件」已纳入主源码、版本族、启动器、spec、图标资源、协作进度.md。
+- **忽略规则**（`.gitignore`）：排除 `ffmpeg.exe`(102MB)/`build/`/`dist/`/`.workbuddy/`/`*.jsonl`/`session.jsonl`/临时诊断脚本(`test_*`/`diag_*`/`replace_*`/`cleanup_*`)/`ScreenRecorder_app*/`/`.proto_thumbs/`/`font_tests/`。
+- **回滚**：`git log --oneline` 查哈希 → `git checkout <哈希>` 查看历史，`git checkout main` 回最新；彻底回退用 `git reset --hard <哈希>`（慎用，会丢弃之后提交）。
+- **差异对比**：`git diff <哈希1> <哈希2> -- screen_recorder_pyside6_v2.py`。
+
+### 开源与云备份
+- 仓库已具备开源所需文件：`README.md`（功能/环境/快速开始/目录/已知事项/许可证）、`LICENSE`（MIT）。
+- 开源发布为**公开仓库**，任何人可查看源码；本地个人数据（`.workbuddy/`、配置中的 `save_dir` 等）已被忽略，不会泄露。
+- 接远程（GitHub/Gitee）后，每轮提交执行 `git push` 即可同步云备份。
