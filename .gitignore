@@ -1,0 +1,26 @@
+# ===== 构建产物 =====
+build/
+dist/
+ScreenRecorder_app/
+ScreenRecorder_app_old/
+__pycache__/
+*.pyc
+
+# ===== 大文件 / 运行时依赖（ffmpeg 体积 100MB+，单独保留，不入库）=====
+ffmpeg.exe
+*.exe
+
+# ===== 会话 / 个人数据 =====
+.workbuddy/
+*.jsonl
+session.jsonl
+
+# ===== 临时诊断 / 测试脚本 =====
+test_*.py
+diag_*.py
+replace_*.py
+cleanup_*.py
+
+# ===== 素材缓存 / 临时目录 =====
+.proto_thumbs/
+font_tests/
