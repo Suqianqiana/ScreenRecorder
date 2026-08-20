@@ -12,6 +12,8 @@ Windows 轻量录屏工具，macOS 风格 UI，**基于 PySide6 (Qt for Python) 
 - **遗留源码**：`screen_recorder.py`（108,019 bytes，tkinter 旧版，仅作备份保留，不再维护）
 - **交付 exe**：`ScreenRecorder_app/ScreenRecorder.exe`（126,549,222 B ≈ 120.7 MB 单文件，PySide6 + ffmpeg 内嵌 + 用户透明图标正确替换，完全自包含，2026-08-17 苏企鹅 UI 精修版）
 - **上一版 exe 备份**：`ScreenRecorder_app/ScreenRecorder.exe.bak`（候选 F 落地版；每次打包自动备份上一版 exe）
+
+
 - **更早 exe 备份**：`ScreenRecorder_app/ScreenRecorder.exe.bak_prev`（候选 F 落地前更早的构建，保留以防回退）
 - **UI 精修问题版备份**：`ScreenRecorder_app/ScreenRecorder.exe.bak_ui`（图标未正确替换、悬浮窗过长的过渡构建，保留以防回退）
 - **ffmpeg**：项目根 `ffmpeg.exe`（gyan 9.0.1 静态构建，102 MB，仅含 dshow / gdigrab / PrintWindow 所需的 rawvideo 管道）
@@ -25,6 +27,7 @@ Windows 轻量录屏工具，macOS 风格 UI，**基于 PySide6 (Qt for Python) 
 本项目已接入 Git 本地版本管理（仓库位于 `screen-recorder/`），并计划开源托管于 GitHub（见文末「开源发布」）。
 
 ### ⚠️ 约定（每一轮改进 / 修复都必须执行）
+
 1. **每完成一轮，必须提交一次**，提交信息格式：`第N轮：<一句话说明本次改动>`。
 2. 提交前确认工作区无重要未跟踪文件；临时脚本（`test_*/diag_*/replace_*/cleanup_*`）、`ffmpeg.exe`、`build/`、`dist/`、`.workbuddy/` 已由 `.gitignore` 排除，不会误入库。
 3. 主源码只改 `screen_recorder_pyside6_v2.py`；改完先 `py_compile` + 离屏回归，再提交。
@@ -32,15 +35,17 @@ Windows 轻量录屏工具，macOS 风格 UI，**基于 PySide6 (Qt for Python) 
 5. 回滚：`git log --oneline` 查哈希 → `git checkout <哈希>` 查看旧版；`git reset --hard <哈希>` 彻底回退（慎用）。
 
 ### 常用命令
+
 - 提交：`git add -A && git commit -m "第N轮：说明"`
 - 历史：`git log --oneline`
 - 推送 GitHub：`git push`
 - 注意：`ffmpeg.exe`（102MB）不入库，换机需单独带上。
 
 ### 开源发布（GitHub）
-- 远程名 `origin`（GitHub 公开仓库，作为开源项目）。
+
+- 远程名 `origin` → GitHub 公开仓库 **`https://github.com/Suqianqiana/ScreenRecorder`**（作为开源项目，已于 2026-08-19 发布，含 5 个提交：seed + 初始基准 + Git 规范章节 + README/LICENSE + 附录与改名 main）。
 - 发布前确保含 `README.md` 与 `LICENSE`（开源许可文件）。
-- 推送：`git push -u origin master`（首次）/ `git push`（后续）。
+- 推送：`git push -u origin main`（首次）/ `git push`（后续）。
 
 ## 文件结构
 
@@ -1537,12 +1542,12 @@ v4.0 后电平已有响应，但"只有系统声音非常大时才有两三格"�
 
 **发现的 4 个隐患（已与用户确认处置）**：
 
-| 隐患 | 内容 | 用户决策 |
-|------|------|----------|
-| 1 | 逻辑缺口：-60~0 映射下"很大声仍2-3格"≈输入约-50dB，收窄范围+增益并不能解决，真因疑为累计统计/设备音量 | 与隐患4联动，4 不加则 1 不存在 |
-| 2 | 回归风险：换 metadata 元数据管线可能把刚修好的电平打回原形 | **按清单执行**（接受风险） |
-| 3 | 双重平滑（数据层 EMA + UI PeakDecay）致迟钝 | 按提议：保持单层，不加 EMA |
-| 4 | +6dB 增益是拍脑袋，掩盖真因 | 按提议：暂不加，先加诊断日志拿真实 dB |
+| 隐患 | 内容                                                           | 用户决策                 |
+| -- | ------------------------------------------------------------ | -------------------- |
+| 1  | 逻辑缺口：-60~0 映射下"很大声仍2-3格"≈输入约-50dB，收窄范围+增益并不能解决，真因疑为累计统计/设备音量 | 与隐患4联动，4 不加则 1 不存在   |
+| 2  | 回归风险：换 metadata 元数据管线可能把刚修好的电平打回原形                           | **按清单执行**（接受风险）      |
+| 3  | 双重平滑（数据层 EMA + UI PeakDecay）致迟钝                              | 按提议：保持单层，不加 EMA      |
+| 4  | +6dB 增益是拍脑袋，掩盖真因                                             | 按提议：暂不加，先加诊断日志拿真实 dB |
 
 ### 实现内容
 
@@ -1592,28 +1597,34 @@ v4.0 后电平已有响应，但"只有系统声音非常大时才有两三格"�
 ## 第二十九轮（2026-08-20 10:43）：v6.0 麦克风无声根因定位 + 核心可观测项 + 麦克风降噪（记录人：WorkBuddy AI 助手）
 
 ### 用户反馈
+
 - 电平跳动幅度已正常，但发现"麦克风模式录音文件根本没声音"（v6.0 清单：麦克风 dshow 采到近静音 RMS=-96.7/Peak=-90.3，系统声音正常 8~9/16 格）。
 - 用户先要求评估 v6.0 清单质量与潜在负面影响再动手；后又新增诉求：麦克风录音噪声偏大，希望加降噪。
 
 ### 诊断质量评估（动手前已向用户说明）
+
 - 核心定位正确：近静音发生在 astats 统计层（编码之前），故无声在 dshow 麦克风采集层，非 AAC/UI/MP4。
 - 关键缺口：清单从"采集静音"直接跳到"全套 dshow 能力探测 + Alternative Name + Profile 选择 + 预检"，但**未先隔离根因层**（Windows 层 vs FFmpeg/dshow 层）；其大工程对 Windows 层静音是白改，且回归风险牵连已正常的系统声音路径。
 - 用户随后自查确认：**根因是 Windows 设置里把麦克风关了**（系统/隐私静音）——清单那套 dshow 探测恰好打错层。据此砍掉打错层的 dshow 探测大工程，只落地清单"仍值得做"的子集。
 
 ### 实施内容
+
 1. **音频健康（静音）告警（清单 §28-30/§39 精华）**：`feed_audio_meta_line` 中，仅当 `_audio_expects_mic`（麦克风/混音模式）且 `disp < -75dB` 持续 ≥1.5s，发 `[音频警告] 麦克风已打开但未检测到有效输入（请检查 Windows 麦克风权限/是否被静音/输入设备）`；**只告警不自动停止**。新增 `_reset_audio_health()` 在 `start_record` / `_start_audio_test` 启动 ffmpeg 前重置状态。此条恰好能 1 秒定位本次"Windows 静音"类问题。
 2. **诊断日志扩展（§31/§39）**：`[电平诊断]` 行补 `设备=<audio>` 与 `后端=dshow/wasapi`，零回归。
 3. **thread_queue_size（§19 稳定性点缀）**：所有音频 `-i` 前加 `-thread_queue_size 4096`，提升双输入实时采集稳定性（与无声无关，低风险）。
 4. **麦克风降噪（用户新诉求）**：偏好页新增"麦克风降噪"勾选框（默认关，`mic_denoise` 配置持久化）；开启时仅对**含麦克风的路径**（纯麦克风设备 / 混音的麦克风支路）注入 `afftdn=nr=12:nf=-28`；系统声音（立体声混音）与 WASAPI 回环**不降噪**，避免污染干净音源。录制 `_build_command` 与测试 `build_audio_test_command` 同步。
 
 ### 关键修复（过程中发现）
+
 - 滤镜图语法 bug：原 `_mic_denoise_filter()` 返回带尾逗号，在 `filter_complex` 子链 `[2:a:0]afftdn,[mic]` 会变成非法。改为返回无逗号 `afftdn=nr=12:nf=-28`，仅在 `-af` 续接处显式加逗号（`afftdn,...,astats`）。
 
 ### 验证
+
 - ✅ `py_compile` 通过。
 - ⚠️ 沙箱无 PySide6/ffmpeg/音频设备，无法跑 functional；已对四条音频路径的 ffmpeg 滤镜串做静态语法核对（混音开/关降噪、纯麦开/关降噪、系统声音不变、WASAPI 不变均合法）。
 
 ### 真机验收（需用户）
+
 - [ ] 偏好页勾"麦克风降噪"后录一段麦克风 → 底噪应明显降低（若"水下/金属感"过重，调小 `afftdn=nr` 或关掉）
 - [ ] 故意在 Windows 把麦克风静音后点「测试」→ 约 1.5s 后应出现 `[音频警告]`
 - [ ] 系统声音（立体声混音）录制 → 声音与之前一致（未被降噪污染）
@@ -1625,9 +1636,11 @@ v4.0 后电平已有响应，但"只有系统声音非常大时才有两三格"�
 > 记录人：WorkBuddy AI 助手 ｜ 生效：第二十九轮之后
 
 ### 为什么用 Git
+
 主源码 `screen_recorder_pyside6_v2.py` 经多轮改动后长期无版本保护，一旦某轮改坏只能靠记忆/手备份恢复。自本约定起，项目以 Git 仓库管理（位于 `screen-recorder/`），可随时回滚任意一轮。
 
 ### 仓库约定
+
 - **每轮改进必须提交**：完成一轮（或一次有意义的改动）后，必须执行提交并写清说明，例如：
   ```
   git add -A
@@ -1639,6 +1652,8 @@ v4.0 后电平已有响应，但"只有系统声音非常大时才有两三格"�
 - **差异对比**：`git diff <哈希1> <哈希2> -- screen_recorder_pyside6_v2.py`。
 
 ### 开源与云备份
+
 - 仓库已具备开源所需文件：`README.md`（功能/环境/快速开始/目录/已知事项/许可证）、`LICENSE`（MIT）。
 - 开源发布为**公开仓库**，任何人可查看源码；本地个人数据（`.workbuddy/`、配置中的 `save_dir` 等）已被忽略，不会泄露。
-- 接远程（GitHub/Gitee）后，每轮提交执行 `git push` 即可同步云备份。
+- 远程仓库已发布：**`https://github.com/Suqianqiana/ScreenRecorder`**（公开仓库，2026-08-19 推送完成，含完整工程文件与提交历史；`ffmpeg.exe` 等大文件按 `.gitignore` 不入库）。
+- 接远程后，每轮提交执行 `git push` 即可同步云备份。
